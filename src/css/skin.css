@@ -1,0 +1,21 @@
+.trActive {
+    text-decoration: line-through;
+    font-style: italic;
+}
+
+.hideRow {
+    display: none;
+}
+
+.task-list {
+    transition: all 0.5s;
+}
+
+.task-list.ng-enter {
+    background-color: green ;
+}
+
+.task-list.ng-leave {
+    background-color: #ffff00;
+}
+

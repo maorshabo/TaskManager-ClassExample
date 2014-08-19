@@ -1,0 +1,8 @@
+Example for the Angularjs course students:
+
+to use this example:
+
+- run bower install and npm install
+- this project use gulp to concat all js files into the 'dist' folder. **don`t forget to launch 'gulp' from the command line!**
+- this project also contains pre-configured karma file. (gulp task for testing will be added at a later time)
+

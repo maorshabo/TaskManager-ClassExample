@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html ng-app="TaskManager">
+<head lang="en">
+    <meta charset="UTF-8">
+
+    <title>AngularJS Course class example</title>
+
+    <script src="../bower_components/angular/angular.min.js"></script>
+    <script src="../dist/app.js"></script>
+
+    <link rel="stylesheet" href="../bower_components/bootstrap/dist/css/bootstrap.css"/>
+    <link rel="stylesheet" href="css/skin.css"/>
+
+</head>
+
+<body>
+
+<div class="container" ng-controller="TaskManagerAppController as app">
+
+    <header class="row">
+        <div class="page-header">
+            <h1>Task Manager
+                <span class="glyphicon glyphicon-th pull-right"></span>
+            </h1>
+        </div>
+    </header>
+
+    <!-- action bar -->
+    <section class="row" ng-controller="TaskActionBarController as actionBar">
+        <div class="panel panel-default">
+            <div class="panel-body">
+                <button class="btn btn-default" ng-click="actionBar.toggleCompletedTask()">show/hide completed</button>
+                <button class="btn btn-default" ng-click="actionBar.clearLog()">Clear Log</button>
+
+            </div>
+        </div>
+    </section>
+    <!-- /action bar -->
+
+    <div class="row">
+
+        <!-- task log -->
+        <div class="col-lg-3" ng-controller="TaskLogController as logController">
+            <ul class="list-unstyled">
+                <li ng-repeat="log in logController.eventsLog">
+                    <samp>{{log.timeStamp}} - {{log.logMsg}}</samp></li>
+            </ul>
+        </div>
+        <!-- /task log -->
+
+        <!-- task table -->
+        <div class="col-lg-7" ng-controller="TaskTableController as taskTable">
+            <table class="table  table-bordered">
+                <thead>
+                <tr>
+                    <th>Done</th>
+                    <th>Title</th>
+                    <th>Description</th>
+                    <th>Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+
+                <tr class="task-list animated" ng-repeat="task in taskAppState.taskList"
+                    ng-class="{hideRow: taskAppState.hideCompleted && task.completed, trActive:task.completed}">
+                    <td class="text-center">
+                        <input class="input" type="checkbox" ng-model="task.completed"/>
+                    </td>
+                    <td>{{ task.title }}</td>
+                    <td>{{ task.description }}</td>
+                    <td>
+                        <div class="btn-group btn-group-sm">
+                            <button class="btn btn-danger" ng-click="taskTable.removeTask(task)">
+                                <span class="glyphicon glyphicon-remove"></span>
+                            </button>
+                            <button class="btn btn-primary" ng-click="taskTable.editTask(task)">
+                                <span class="glyphicon glyphicon-edit"></span>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+                </tbody>
+
+            </table>
+        </div>
+        <!-- /task table -->
+
+        <!-- task task-form -->
+        <div class="col-lg-2" ng-controller="TaskFormController as taskForm">
+
+            <form class="form-horizontal">
+
+                <div class="form-group">
+                    <input type="text" ng-model="taskAppState.activeTask.title" class="form-control"
+                           placeholder="Title">
+                </div>
+
+                <div class="form-group">
+                    <textarea rows="6" ng-model="taskAppState.activeTask.description" class="form-control"
+                              placeholder="Description"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <button class="form-control btn btn-primary" ng-click="taskForm.addTask(taskAppState.activeTask)">
+                        Add
+                    </button>
+                </div>
+            </form>
+        </div><!-- /task task-form -->
+
+    </div>
+</div><!-- /container-->
+
+
+
+
+</body>
+
+</html>
