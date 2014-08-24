@@ -1,6 +1,6 @@
 (function () {
 
-    function TaskLogController($scope) {
+    function TaskLogController($scope,LogManager) {
 
         this.eventsLog = [];
 
@@ -9,10 +9,12 @@
                 timeStamp: new Date(),
                 logMsg: type
             });
+            LogManager.saveLogs(this.eventsLog);
         }.bind(this);
 
         this.clearLog = function () {
             this.eventsLog = [];
+            LogManager.clearLogs();
         }.bind(this);
 
         $scope.$on('LogEvent:userAction', this.logTaskEvent);
@@ -20,6 +22,6 @@
     }
 
     angular.module('TaskManager')
-        .controller('TaskLogController', TaskLogController);
+        .controller('TaskLogController', ['$scope','LogManager', TaskLogController]);
 
 }());

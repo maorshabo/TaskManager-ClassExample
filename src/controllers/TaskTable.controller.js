@@ -1,9 +1,10 @@
 (function () {
 
-    function TaskTableController(scope) {
+    function TaskTableController(scope,DataStorage) {
 
         this.removeTask = function (task) {
             scope.taskAppState.taskList.splice(scope.taskAppState.taskList.indexOf(task), 1);
+            DataStorage.save("tasks",scope.taskAppState.taskList);
             scope.$emit('TaskAppEvent','LogEvent:userAction','Task been removed')
         };
 
@@ -15,6 +16,6 @@
     }
 
     angular.module('TaskManager')
-        .controller('TaskTableController', ['$scope',TaskTableController]);
+        .controller('TaskTableController', ['$scope','DataStorage',TaskTableController]);
 
 }());

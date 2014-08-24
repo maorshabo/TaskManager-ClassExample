@@ -3,10 +3,10 @@
 <head lang="en">
     <meta charset="UTF-8">
 
-    <title>AngularJS Course class example</title>
+    <title>Directives</title>
 
     <script src="../bower_components/angular/angular.min.js"></script>
-    <script src="../dist/app.js"></script>
+    <script src="taskManager.js"></script>
 
     <link rel="stylesheet" href="../bower_components/bootstrap/dist/css/bootstrap.css"/>
     <link rel="stylesheet" href="css/skin.css"/>
@@ -15,45 +15,54 @@
 
 <body>
 
+<ng-include src="'includes/nav-bar.html'"></ng-include>
+
 <div class="container" ng-controller="TaskManagerAppController as app">
 
     <header class="row">
         <div class="page-header">
             <h1>Task Manager
-                <span class="glyphicon glyphicon-th pull-right"></span>
+                <span ng-click="app.toggleActionBar()"
+                      class="glyphicon glyphicon-th pull-right"></span>
             </h1>
         </div>
     </header>
 
-    <!-- action bar -->
-    <section class="row" ng-controller="TaskActionBarController as actionBar">
-        <div class="panel panel-default">
-            <div class="panel-body">
-                <button class="btn btn-default" ng-click="actionBar.toggleCompletedTask()">show/hide completed</button>
-                <button class="btn btn-default" ng-click="actionBar.clearLog()">Clear Log</button>
-
-            </div>
-        </div>
-    </section>
-    <!-- /action bar -->
+    <ng-include src="'includes/action-bar.html'" ng-show="taskAppState.showActionBar"></ng-include>
 
     <div class="row">
 
         <!-- task log -->
         <div class="col-lg-3" ng-controller="TaskLogController as logController">
             <ul class="list-unstyled">
-                <li ng-repeat="log in logController.eventsLog">
-                    <samp>{{log.timeStamp}} - {{log.logMsg}}</samp></li>
+                <li ng-repeat="log in logController.eventsLog" ng-class="{oddLog: $odd}">
+
+                    <samp>{{log.timeStamp | date:'shortDate'}} - {{log.logMsg}}</samp></li>
             </ul>
         </div>
         <!-- /task log -->
 
         <!-- task table -->
         <div class="col-lg-7" ng-controller="TaskTableController as taskTable">
-            <table class="table  table-bordered">
+
+            <form class="form-group form-inline pull-right">
+                <div class="input-group">
+                    <input type="text"
+                           class="form-control"
+                           ng-model="task.filter"
+                           ng-disabled="taskAppState.taskList.length <= 0"/>
+
+                    <div class="input-group-addon">
+                        <span class="glyphicon glyphicon-search"></span>
+                    </div>
+                </div>
+            </form>
+
+            <table class="table table-striped table-bordered">
                 <thead>
                 <tr>
                     <th>Done</th>
+                    <th>Priority</th>
                     <th>Title</th>
                     <th>Description</th>
                     <th>Actions</th>
@@ -61,11 +70,13 @@
                 </thead>
                 <tbody>
 
-                <tr class="task-list animated" ng-repeat="task in taskAppState.taskList"
-                    ng-class="{hideRow: taskAppState.hideCompleted && task.completed, trActive:task.completed}">
+                <tr ng-repeat="task in taskAppState.taskList | filter:task.filter"
+                    ng-class="{hideRow: taskAppState.hideCompleted && task.completed, trActive:task.completed}"
+                    ng-dblclick="taskTable.editTask(task)">
                     <td class="text-center">
                         <input class="input" type="checkbox" ng-model="task.completed"/>
                     </td>
+                    <td>{{ task.priority }}</td>
                     <td>{{ task.title }}</td>
                     <td>{{ task.description }}</td>
                     <td>
@@ -83,36 +94,76 @@
 
             </table>
         </div>
-        <!-- /task table -->
+
 
         <!-- task task-form -->
         <div class="col-lg-2" ng-controller="TaskFormController as taskForm">
 
-            <form class="form-horizontal">
+            <form class="newTaskForm form-horizontal" name="newTaskForm">
 
                 <div class="form-group">
-                    <input type="text" ng-model="taskAppState.activeTask.title" class="form-control"
-                           placeholder="Title">
+                    <select class="form-control"
+                            name="taskPriority"
+                            ng-model="taskAppState.activeTask.priority"
+                            ng-options="value for value in taskForm.taskPriorities"
+                            required>
+                        <option value="" class="text-muted">Priority</option>
+                    </select>
+
+                    <div ng-if="newTaskForm.taskPriority.$error.required">
+                        <span class="text-danger">Priority is required.</span>
+                    </div>
                 </div>
 
                 <div class="form-group">
-                    <textarea rows="6" ng-model="taskAppState.activeTask.description" class="form-control"
-                              placeholder="Description"></textarea>
+                    <input type="text"
+                           name="taskTitle"
+                           ng-model="taskAppState.activeTask.title"
+                           class="form-control"
+                           placeholder="Title"
+                           ng-minlength="6"
+                           required>
+
+                    <div ng-if="newTaskForm.taskTitle.$error.minlength">
+                        <span class="text-danger">Title must be at least 6 chars</span>
+                    </div>
                 </div>
 
                 <div class="form-group">
-                    <button class="form-control btn btn-primary" ng-click="taskForm.addTask(taskAppState.activeTask)">
-                        Add
+                    <textarea rows="6"
+                              name="taskDescription"
+                              ng-model="taskAppState.activeTask.description"
+                              class="form-control"
+                              placeholder="Description"
+                              required>
+                    </textarea>
+                </div>
+
+
+                <div class="form-group">
+                    <button type="button" class="form-control btn btn-primary"
+                            ng-click="taskForm.addTask(taskAppState.activeTask)"
+                            ng-disabled="!newTaskForm.$valid"
+                            >
+                        OK
                     </button>
                 </div>
             </form>
-        </div><!-- /task task-form -->
+        </div>
+        <!-- /task task-form -->
 
     </div>
-</div><!-- /container-->
+</div>
+<!-- /container-->
 
-
-
+<!-- load app controllers -->
+<script src="controllers/TaskManagerApp.controller.js"></script>
+<script src="controllers/TaskActionBar.controller.js"></script>
+<script src="controllers/TaskTable.controller.js"></script>
+<script src="controllers/TaskLog.controller.js"></script>
+<script src="controllers/TaskForm.controller.js"></script>
+<script src="services/dataStorageService.js"></script>
+<script src="services/LogManager.js"></script>
 
 </body>
 

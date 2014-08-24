@@ -1,3 +1,6 @@
 (function () {
-    angular.module('TaskManager', [])
+    angular.module('TaskManager', ['DataStorage'])
+        .config([LogManagerProvider, function() {
+            LogManagerProvider.setPrintToConsole(false);
+        }]);
 }());
